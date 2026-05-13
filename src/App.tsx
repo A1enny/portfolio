@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Container from "@/components/common/Container";
 import Navbar from "@/components/Layout/Navbar";
 import Footer from "@/components/Layout/Footer";
-import { motion, AnimatePresence, Trasition } from "framer-motion";
+import { motion, AnimatePresence, Transition } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import { projects } from "./data/projects";
@@ -15,9 +15,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-/* ================================================================== */
-/*  DATA                                                                */
-/* ================================================================== */
+/* DATA */
 
 const sections = [
   { id: "home", label: "Home" },
@@ -26,9 +24,7 @@ const sections = [
   { id: "contact", label: "Contact" },
 ];
 
-/* ================================================================== */
-/*  ANIMATION VARIANTS                                                  */
-/* ================================================================== */
+/* ANIMATION VARIANTS */
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -39,9 +35,7 @@ const fadeUp = {
   },
 };
 
-/* ================================================================== */
-/*  PROJECT CARD                                                        */
-/* ================================================================== */
+/* PROJECT CARD */
 
 function ProjectCard({
   project,
@@ -108,24 +102,19 @@ function ProjectCard({
   );
 }
 
-/* ================================================================== */
-/*  APP                                                                 */
-/* ================================================================== */
+/* APP  */
 
 function App() {
-  /* ---------------- THEME ---------------- */
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark"),
   );
 
-  /* ---------------- PROJECT DETAIL PAGE ---------------- */
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null,
   );
   const selectedProject =
     projects.find((p) => p.id === selectedProjectId) ?? null;
 
-  /* ---------------- NAVIGATION ---------------- */
   const [active, setActive] = useState("home");
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({
@@ -142,10 +131,8 @@ function App() {
     });
   };
 
-  /* ---------------- PROJECTS CAROUSEL STATE ---------------- */
   const [activeIndex, setActiveIndex] = useState(0);
 
-  /* ---------------- EMBLA (mobile carousel) ---------------- */
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -166,7 +153,6 @@ function App() {
     setActiveIndex((emblaApi.selectedScrollSnap() + 1) % projects.length);
   }, [emblaApi]);
 
-  /* ---------------- AUTO DARK MODE SYNC ---------------- */
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -178,7 +164,6 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  /* ---------------- SECTION ACTIVE (scroll spy) ---------------- */
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -195,7 +180,6 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  /* ---------------- AUTO CYCLE FEATURED CARD ---------------- */
   useEffect(() => {
     if (selectedProjectId) return;
     const interval = setInterval(() => {
@@ -207,9 +191,8 @@ function App() {
   const featured = projects[activeIndex];
   const rest = projects.filter((_, i) => i !== activeIndex).slice(0, 2);
 
-  /* ============================================================ */
-  /*  PROJECT DETAIL PAGE (full-screen overlay)                   */
-  /* ============================================================ */
+  /*  PROJECT DETAIL PAGE (full-screen overlay) */
+
   if (selectedProject) {
     return (
       <AnimatePresence mode="wait">
@@ -224,9 +207,8 @@ function App() {
     );
   }
 
-  /* ============================================================ */
-  /*  MAIN SITE                                                    */
-  /* ============================================================ */
+  /*  MAIN SITE */
+
   return (
     <>
       <Navbar
@@ -237,13 +219,11 @@ function App() {
 
       <main className="min-h-screen overflow-hidden bg-[var(--color-background)] text-[var(--color-text-primary)]">
         <div className="bg-glow pointer-events-none fixed inset-0 -z-10" />
-
-        {/* ============================================================ */}
-        {/* HERO                                                          */}
-        {/* ============================================================ */}
         <section
           id="home"
-          ref={(el) => (sectionRefs.current.home = el)}
+          ref={(el) => {
+            sectionRefs.current.home = el;
+          }}
           className="section-padding relative flex min-h-screen items-center overflow-hidden"
         >
           <div className="absolute inset-0 z-0">
@@ -363,12 +343,13 @@ function App() {
           </motion.button>
         </section>
 
-        {/* ============================================================ */}
-        {/* ABOUT — Responsive rewrite                                    */}
-        {/* ============================================================ */}
+        {/* ABOUT */}
+
         <section
           id="about"
-          ref={(el) => (sectionRefs.current.about = el)}
+          ref={(el) => {
+            sectionRefs.current.about = el;
+          }}
           className="relative min-h-screen overflow-hidden bg-black text-white"
         >
           {/* BG */}
@@ -522,7 +503,9 @@ function App() {
         {/* ============================================================ */}
         <section
           id="projects"
-          ref={(el) => (sectionRefs.current.projects = el)}
+          ref={(el) => {
+            sectionRefs.current.projects = el;
+          }}
           className="relative min-h-screen overflow-hidden bg-black text-white"
         >
           {/* BG */}
@@ -616,7 +599,10 @@ function App() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.38,
+                    ease: [0.16, 1, 0.3, 1] as const,
+                  }}
                   style={{ gridColumn: 2, gridRow: 1 }}
                   className="h-full"
                 >
@@ -638,7 +624,7 @@ function App() {
                   exit={{ opacity: 0, y: -12 }}
                   transition={{
                     duration: 0.38,
-                    ease: [0.16, 1, 0.3, 1],
+                    ease: [0.16, 1, 0.3, 1] as const,
                     delay: 0.05,
                   }}
                   style={{ gridColumn: 2, gridRow: 2 }}
@@ -689,12 +675,13 @@ function App() {
           </motion.div>
         </section>
 
-        {/* ============================================================ */}
-        {/* CONTACT — Responsive rewrite                                  */}
-        {/* ============================================================ */}
+        {/* CONTACT */}
+
         <section
           id="contact"
-          ref={(el) => (sectionRefs.current.contact = el)}
+          ref={(el) => {
+            sectionRefs.current.contact = el;
+          }}
           className="relative min-h-screen overflow-hidden bg-black text-white"
         >
           <div className="absolute inset-0 z-0">

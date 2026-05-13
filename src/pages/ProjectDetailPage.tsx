@@ -33,26 +33,27 @@ const fadeUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: i * 0.07 },
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1] as const,
+      delay: i * 0.07,
+    },
   }),
 };
 
 const AUTO_CYCLE_MS = 10_000;
 
-/* ── Helpers ──────────────────────────────────────────────────────── */
 function isYouTube(
   item: MediaItem,
 ): item is Extract<MediaItem, { type: "youtube" }> {
   return item.type === "youtube";
 }
 
-/** Thumbnail src for any media item */
 function mediaThumbnail(item: MediaItem): string {
   if (isYouTube(item)) return youtubeThumbnail(item.videoId, "hqdefault");
   return item.src;
 }
 
-/* ── YouTube embed component ─────────────────────────────────────── */
 function YouTubeEmbed({
   videoId,
   autoplay = false,
@@ -75,7 +76,6 @@ function YouTubeEmbed({
   );
 }
 
-/* ── YouTube thumbnail with play button (before user clicks) ──────── */
 function YouTubeThumbnailSlide({
   videoId,
   onClick,
@@ -120,7 +120,6 @@ function YouTubeThumbnailSlide({
   );
 }
 
-/* ── Main component ───────────────────────────────────────────────── */
 function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [playingVideo, setPlayingVideo] = useState(false); // true = iframe shown
@@ -136,7 +135,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const progressStartRef = useRef<number>(Date.now());
 
-  // Build the media list: coverImage first (if not already in media), then media[]
   const allMedia: MediaItem[] =
     project.media && project.media.length > 0
       ? project.media
@@ -146,13 +144,8 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
   const activeItem = allMedia[activeIndex];
   const isActiveYouTube = isYouTube(activeItem);
 
-  // Auto-cycle should pause when:
-  // 1. User is hovering
-  // 2. Lightbox is open
-  // 3. A YouTube video is actively playing (iframe visible)
   const shouldPause = isHovered || lightboxOpen || playingVideo;
 
-  // ── reset on project change ──
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setActiveIndex(0);
@@ -162,7 +155,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
     setProgress(0);
   }, [project.id, project.categoryId]);
 
-  // When active slide changes, reset playing state
   useEffect(() => {
     setPlayingVideo(false);
   }, [activeIndex]);
@@ -267,7 +259,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
       transition={{ duration: 0.25 }}
       className={`min-h-screen ${bg} ${text}`}
     >
-      {/* ── LIGHTBOX ─────────────────────────────────────────────── */}
       <AnimatePresence>
         {lightboxOpen && (
           <motion.div
@@ -402,7 +393,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
         )}
       </AnimatePresence>
 
-      {/* ── STICKY HEADER ─────────────────────────────────────────── */}
       <div
         className={`sticky top-0 z-40 border-b backdrop-blur-xl ${border} ${
           isDark ? "bg-black/60" : "bg-white/80"
@@ -835,7 +825,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                             exit={{ height: 0, opacity: 0 }}
                             transition={{
                               duration: 0.25,
-                              ease: [0.16, 1, 0.3, 1],
+                              ease: [0.16, 1, 0.3, 1] as const,
                             }}
                             className="overflow-hidden"
                           >
