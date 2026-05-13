@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Container from "@/components/common/Container";
 import Navbar from "@/components/Layout/Navbar";
 import Footer from "@/components/Layout/Footer";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Trasition } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import { projects } from "./data/projects";
@@ -35,7 +35,7 @@ const fadeUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -594,7 +594,10 @@ function App() {
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.45,
+                    ease: [0.16, 1, 0.3, 1] as const,
+                  }}
                   style={{ gridColumn: 1, gridRow: "1 / 3" }}
                   className="h-full"
                 >
