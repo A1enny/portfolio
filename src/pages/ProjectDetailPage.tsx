@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useCallback, useRef } from "react";
 import type { Project, MediaItem } from "../data/projects";
 import { projectCategories, youtubeThumbnail } from "../data/projects";
+import GlobalBackground from "@/styles/GlobalBackground";
 
 interface Props {
   project: Project;
@@ -257,8 +258,10 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className={`min-h-screen ${bg} ${text}`}
+      className={`min-h-screen ${text} relative`}
     >
+      {/* BG image — fixed, shared layer */}
+      <GlobalBackground isDark={isDark} />
       <AnimatePresence>
         {lightboxOpen && (
           <motion.div

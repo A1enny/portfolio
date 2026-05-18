@@ -63,8 +63,8 @@ function Footer({ onNavigate, isDark }: FooterProps) {
     <footer
       className={`relative border-t ${
         isDark
-          ? "border-white/8 bg-[#090909] text-white"
-          : "border-neutral-200 bg-neutral-50 text-neutral-900"
+          ? "border-white/[0.07] bg-[#181818] text-white"
+          : "border-neutral-200/70 bg-[#f2f2ef] text-neutral-900"
       }`}
     >
       {/* TOP SECTION */}
@@ -166,7 +166,7 @@ function Footer({ onNavigate, isDark }: FooterProps) {
                   : "text-neutral-500 hover:text-neutral-900"
               }`}
             >
-              065 - 731 - 7994
+              +66 65-731-7994
             </a>
 
             {/* STATUS */}
@@ -189,7 +189,7 @@ function Footer({ onNavigate, isDark }: FooterProps) {
 
       {/* DIVIDER */}
       <div
-        className={`mx-8 md:mx-16 h-px ${isDark ? "bg-white/6" : "bg-neutral-200"}`}
+        className={`mx-8 md:mx-16 h-px ${isDark ? "bg-white/[0.05]" : "bg-neutral-300/60"}`}
       />
 
       {/* BOTTOM BAR */}

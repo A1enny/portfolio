@@ -84,8 +84,8 @@ function Navbar({ active, onNavigate, onLogoClick }) {
         className={`fixed top-0 z-50 w-full transition-all duration-300 ${
           isScrolled
             ? isDark
-              ? "border-b border-white/10 bg-black/60 backdrop-blur-xl"
-              : "border-b border-black/10 bg-white/70 backdrop-blur-xl"
+              ? "border-b border-white/[0.07] bg-[#1a1a1a]/75 backdrop-blur-xl"
+              : "border-b border-black/[0.06] bg-[#f8f8f6]/80 backdrop-blur-xl"
             : "bg-transparent"
         }`}
       >
@@ -189,8 +189,8 @@ function Navbar({ active, onNavigate, onLogoClick }) {
               transition={{ duration: 0.22 }}
               className={`border-t md:hidden ${
                 isDark
-                  ? "border-white/10 bg-black/95"
-                  : "border-black/10 bg-white/95"
+                  ? "border-white/[0.07] bg-[#1c1c1c]/96 backdrop-blur-xl"
+                  : "border-black/[0.06] bg-[#f7f7f5]/96 backdrop-blur-xl"
               }`}
             >
               <Container>
@@ -211,6 +211,28 @@ function Navbar({ active, onNavigate, onLogoClick }) {
                       {link.label}
                     </button>
                   ))}
+
+                  {/* MOBILE THEME TOGGLE */}
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`text-sm ${isDark ? "text-white/50" : "text-black/50"}`}
+                    >
+                      {isDark ? "Dark mode" : "Light mode"}
+                    </span>
+                    <button
+                      onClick={toggleTheme}
+                      className={`
+                        flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200
+                        ${
+                          isDark
+                            ? "border-white/10 bg-white/5 text-white hover:bg-white/10"
+                            : "border-black/10 bg-black/[0.04] text-black hover:bg-black/[0.08]"
+                        }
+                      `}
+                    >
+                      {isDark ? <Sun size={16} /> : <Moon size={16} />}
+                    </button>
+                  </div>
 
                   {/* MOBILE RESUME */}
                   <button

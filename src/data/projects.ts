@@ -116,57 +116,6 @@ export const projectCategories: ProjectCategory[] = [
     icon: "🌐",
     items: [
       {
-        id: "webpage-design-portfolio",
-        title: "Portfolio Website",
-        tagline: "Personal portfolio with bento grid & smooth scroll",
-        description:
-          "พอร์ตโฟลิโอนี้ ออกแบบและสร้างขึ้นใหม่ตั้งแต่เริ่มต้น เพื่อนำเสนองานในด้านการพัฒนาเว็บ การออกแบบกราฟิก และการผลิตวิดีโอ มุ่งเน้นไปที่ประสิทธิภาพ การ Transition ที่ลื่นไหล และมี style ที่เป็นเอกลักษณ์",
-
-        coverImage: "/images/project/portfolio/1.png",
-
-        /** backward compatibility */
-        images: [
-          "/images/project/portfolio/2.png",
-          "/images/project/portfolio/3.png",
-        ],
-
-        /** NEW */
-        media: [
-          {
-            type: "image",
-            src: "/images/project/portfolio/1.png",
-          },
-          {
-            type: "image",
-            src: "/images/project/portfolio/2.png",
-          },
-          {
-            type: "image",
-            src: "/images/project/portfolio/3.png",
-          },
-        ],
-
-        year: "2025",
-        role: "Designer & Full-Stack Developer",
-        liveUrl: "https://pasin.dev",
-        githubUrl: "https://github.com/",
-        highlights: [
-          "Dark / light mode พร้อมระบบเว็บไซต์ที่ลื่นไหล",
-          "แสดงผลงานในรูปแบบ Bento Grid พร้อมแอนิเมชันสลับอัตโนมัติ",
-          "การเลื่อนหน้าเว็บแบบ Smooth Scroll ด้วย Lenis พร้อมระบบนำทางตามแต่ละ Section",
-          "รองรับการใช้งานทั้งบนมือถือ แท็บเล็ต และเดสก์ท็อป",
-        ],
-        tags: [
-          "Figma",
-          "React",
-          "Vite",
-          "TypeScript",
-          "Tailwind CSS",
-          "Framer Motion",
-        ],
-      },
-
-      {
         id: "webpage-design-landing",
         title: "Landing Pages",
         tagline: "Modern responsive landing pages with clean interactions",
@@ -174,7 +123,7 @@ export const projectCategories: ProjectCategory[] = [
         description:
           "ผลงานนี้เป็นส่วนหนึ่งของการฝึกงานที่ iBusiness Corporation Co., Ltd. ในตำแหน่ง UX/UI Designer โดยได้รับมอบหมายให้ออกแบบหน้าเว็บไซต์สำหรับองค์กรและโรงพยาบาลต่าง ๆ\nซึ่งเปิดโอกาสให้สามารถนำเสนอแนวคิดและสไตล์การออกแบบได้อย่างอิสระ ภายใต้เงื่อนไขของ TOR และ User Requirement ของแต่ละโปรเจกต์\n\nแนวทางการออกแบบมุ่งเน้นการสร้าง Landing Page ที่ทันสมัย รองรับการแสดงผลแบบ Responsive พร้อมให้ความสำคัญกับประสบการณ์ผู้ใช้ (User Experience) ผ่านการจัดวางองค์ประกอบที่สะอาดตา การใช้งานที่ลื่นไหล และการเลือกใช้ Typography อย่างเหมาะสม เพื่อสร้างสมดุลระหว่างความสวยงามและการใช้งานจริงของเว็บไซต์",
 
-        coverImage: "/images/project/landing/1.png",
+        coverImage: "/images/project/garphic/5.png",
 
         images: [
           "/images/project/landing/2.png",
@@ -264,6 +213,57 @@ export const projectCategories: ProjectCategory[] = [
     icon: "🎨",
     items: [
       {
+        id: "graphic-design-showcase",
+        title: "Garphic Design Showcase",
+        tagline: "This is my Show case Skill",
+
+        description: "พิ้นที่เเสดงผลงานกราฟิก",
+
+        coverImage: "/images/project/garphic/1.png",
+
+        images: [
+          "/images/project/garphic/1.png",
+          "/images/project/garphic/2.png",
+        ],
+
+        media: [
+          {
+            type: "image",
+            src: "/images/project/garphic/1.png",
+          },
+          {
+            type: "image",
+            src: "/images/project/garphic/2.png",
+          },
+          {
+            type: "image",
+            src: "/images/project/garphic/3.png",
+          },
+          {
+            type: "image",
+            src: "/images/project/garphic/4.png",
+          },
+          {
+            type: "image",
+            src: "/images/project/garphic/5.png",
+          },
+          {
+            type: "image",
+            src: "/images/project/garphic/6.png",
+          },
+        ],
+
+        year: "2023",
+        role: "Graphic Designer",
+        highlights: [
+          "Selected Works",
+          "Design Showcase",
+          "Creative Collection",
+          "Visual Playground",
+        ],
+        tags: ["Photoshop"],
+      },
+      {
         id: "graphic-design-print",
         title: "Facebook Banners",
         tagline: "Seasonal campaign banners for brands and special occasions",
@@ -337,7 +337,7 @@ export const projectCategories: ProjectCategory[] = [
         description: ` ช่อง YouTube นี้เป็นโปรเจกต์ส่วนตัวที่สร้างขึ้นเพื่อฝึกฝนและพัฒนาทักษะด้านการตัดต่อวิดีโอ การเล่าเรื่อง และการสร้างสรรค์คอนเทนต์ในเวลาว่าง โดยเนื้อหาส่วนใหญ่จะเน้นไปที่การทดลองสไตล์การตัดต่อ การจัดจังหวะของวิดีโอ (Pacing) การเลือกใช้เพลง และการสร้างอารมณ์ผ่านภาพและเสียง
         \nภายในโปรเจกต์มีการลงมือทำตั้งแต่การวางคอนเซปต์ คิดรูปแบบวิดีโอ ตัดต่อ ออกแบบ Thumbnail ไปจนถึงการเผยแพร่ผลงานจริงบน YouTube ซึ่งช่วยพัฒนาทักษะทั้งในด้าน Creative Design, Video Editing และ Storytelling ผ่านการสร้างผลงานอย่างต่อเนื่อง`,
 
-        coverImage: "/images/project/youtube/1.png",
+        coverImage: "/images/project/garphic/1.png",
 
         images: [],
 
@@ -378,6 +378,48 @@ export const projectCategories: ProjectCategory[] = [
         ],
         tags: ["Premiere Pro", "After Effects", "Photoshop", "Illustrator"],
       },
+      {
+        id: "video-editing-short",
+        title: "Short Story",
+
+        tagline: "From Imagination to Screen",
+
+        description: `โปรเจกต์หนังสั้นนี้ เป็นวิดีโอเชิงสร้างสรรค์ที่เริ่มทำขึ้นเพื่อประกวดตอนช่วงมัธยม เพื่อทดลองเล่าเรื่องผ่านภาพ เสียง และจังหวะของวิดีโอในสไตล์ของตัวเอง โดยในช่วงนั้นเป็นจุดเริ่มต้นของการเรียนรู้ด้าน Video Editing, Cinematic Composition และ Creative Storytelling ผ่านการลงมือทำจริง  
+        \n\nโปรเจกต์นี้ครอบคลุมตั้งแต่การคิดไอเดีย วางคอนเซปต์ ถ่ายทำ ตัดต่อ ออกแบบ Thumbnail ไปจนถึงการเผยแพร่ผลงานบน YouTube ซึ่งช่วยให้ได้พัฒนาทักษะด้านการสื่อสารเชิงสร้างสรรค์และการสร้างคอนเทนต์อย่างต่อเนื่อง แม้งานเหล่านี้จะเป็นผลงานในช่วงเริ่มต้น แต่ถือเป็นก้าวสำคัญที่ทำให้ต่อยอดและพัฒนาทักษะด้านงานวิดีโอได้มากยิ่งขึ้นในปัจจุบัน`,
+
+        coverImage: "/images/project/garphic/3.png",
+
+        images: [],
+
+        media: [
+          {
+            type: "image",
+            src: "/images/project/short/1.png",
+          },
+          {
+            type: "youtube",
+            videoId: toYouTubeId(
+              "https://www.youtube.com/watch?v=EB4NbXuz0w0&t=28s",
+            ),
+          },
+          {
+            type: "youtube",
+            videoId: toYouTubeId(
+              "https://www.youtube.com/watch?v=cfJAF4S_AcI&t=156s",
+            ),
+          },
+        ],
+
+        year: "2019",
+        role: "Video Editor",
+        highlights: [
+          "เริ่มต้นสร้างโปรเจกต์หนังสั้นและวิดีโอตั้งแต่ช่วงมัธยมเพื่อฝึกฝนทักษะด้านการตัดต่อและการเล่าเรื่อง",
+          "ดูแลกระบวนการผลิตคอนเทนต์ด้วยตนเอง ตั้งแต่คิดคอนเซปต์ ถ่ายทำ ตัดต่อ และเผยแพร่ผลงานบน YouTube",
+          "ทดลองการเล่าเรื่องผ่านภาพ เสียง และจังหวะวิดีโอ เพื่อสร้างอารมณ์และประสบการณ์ให้ผู้ชม",
+          "พัฒนาทักษะด้าน Video Editing, Creative Storytelling และ Visual Design ผ่านการสร้างผลงานจริงอย่างต่อเนื่อง",
+        ],
+        tags: ["Premiere Pro", "After Effects"],
+      },
     ],
   },
 
@@ -388,7 +430,7 @@ export const projectCategories: ProjectCategory[] = [
     items: [
       {
         id: "coding-fullstack",
-        title: "Mawmong POS WEB-APP",
+        title: "Meawmong POS WEB-APP",
         tagline: "Full-stack applications built for performance and scale",
 
         description: `
@@ -396,7 +438,7 @@ export const projectCategories: ProjectCategory[] = [
         \nภายในโปรเจกต์มีส่วนร่วมทั้งในด้าน UX/UI Design และการพัฒนาเว็บไซต์แบบ Full-Stack \nตั้งแต่การออกแบบโครงสร้างระบบ การออกแบบหน้าตา Interface ไปจนถึงการพัฒนาระบบจริงด้วย Vite + React สำหรับ Frontend และ Node.js ร่วมกับ phpMyAdmin สำหรับ Backend และการจัดการฐานข้อมูล
         \nแนวทางการออกแบบมุ่งเน้นให้ระบบใช้งานง่าย ลดขั้นตอนการทำงานภายในร้าน และช่วยให้เจ้าของร้านสามารถจัดการข้อมูลต่าง ๆ ได้สะดวกและมีประสิทธิภาพมากยิ่งขึ้น`,
 
-        coverImage: "/images/project/maw/1.png",
+        coverImage: "/images/project/maw/MAW.png",
 
         images: [
           "/images/project/maw/2.png",
