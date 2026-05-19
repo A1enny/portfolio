@@ -410,10 +410,12 @@ function MediaEditor({
    PROJECT FORM MODAL
 ══════════════════════════════════════════════ */
 
-const emptyProject = (): Omit<
-  FSProjectItem,
-  "id" | "createdAt" | "updatedAt"
-> => ({
+const emptyProject = (
+  categoryId = "",
+  category = "",
+): Omit<FSProjectItem, "id" | "createdAt" | "updatedAt"> => ({
+  categoryId,
+  category,
   title: "",
   tagline: "",
   description: "",
@@ -430,6 +432,7 @@ const emptyProject = (): Omit<
 });
 
 interface ProjectFormProps {
+  categoryName?: string;
   initial?: FSProjectItem;
   categoryId: string;
   onSave: (
@@ -440,11 +443,14 @@ interface ProjectFormProps {
 
 function ProjectForm({
   initial,
-  categoryId: _categoryId,
+  categoryId,
+  categoryName = "",
   onSave,
   onClose,
 }: ProjectFormProps) {
-  const [form, setForm] = useState(initial ? { ...initial } : emptyProject());
+  const [form, setForm] = useState(
+    initial ? { ...initial } : emptyProject(categoryId, categoryName),
+  );
   const [saving, setSaving] = useState(false);
   const [highlightInput, setHighlightInput] = useState("");
   const [tagInput, setTagInput] = useState("");
@@ -978,6 +984,9 @@ function CategoryManager({ categories, onRefresh, pushToast }: CatPanelProps) {
           <ProjectForm
             initial={projectForm.project}
             categoryId={projectForm.catId}
+            categoryName={
+              categories.find((c) => c.id === projectForm.catId)?.category ?? ""
+            }
             onClose={() => {
               setProjectForm(null);
               onRefresh();
@@ -1406,6 +1415,15 @@ function DeployPanel({
 
         {/* PAT */}
         <div>
+          <label className="block text-[11px] text-white/40 mb-1.5">
+            git add .
+            <br />
+            git commit -m "Your commit message"
+            <br />
+            git push origin main
+            <br />
+            <br />
+          </label>
           <label className="block text-[11px] text-white/40 mb-1.5">
             PAT Token
           </label>
