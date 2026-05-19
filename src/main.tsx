@@ -8,12 +8,13 @@ import "@fontsource/ibm-plex-sans-thai/600.css";
 import "@fontsource/ibm-plex-sans-thai/700.css";
 
 import App from "./App.tsx";
+import AdminPage from "./pages/Adminpage.tsx";
 import "./styles/globals.css";
 
 document.documentElement.classList.add("dark");
 
+const isAdmin = window.location.pathname === "/admin";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <React.StrictMode>{isAdmin ? <AdminPage /> : <App />}</React.StrictMode>,
 );

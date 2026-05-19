@@ -1,3 +1,4 @@
+// src/App.tsx — ดึงข้อมูลจาก Supabase ผ่าน useSupabaseProjects
 import { useCallback, useEffect, useRef, useState } from "react";
 import Container from "@/components/common/Container";
 import Navbar from "@/components/Layout/Navbar";
@@ -9,8 +10,8 @@ import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ProjectsHubPage from "./pages/ProjectsHubPage";
 import IntroScreen from "./components/introscreen";
 import { useNavigation } from "./hooks/useNavigation";
-import { projects } from "./data/projects";
-import type { Project } from "./data/projects";
+import { useSupabaseProjects } from "./hooks/useSupabaseProjects";
+import type { Project } from "./hooks/useSupabaseProjects";
 import {
   ArrowUpRight,
   ChevronLeft,
@@ -24,6 +25,7 @@ import {
   MapPin,
   ExternalLink,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 
 /* ─── ANIMATION VARIANTS ─── */
@@ -40,7 +42,7 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
-/* ─── BENTO CELL — borderless ─── */
+/* ─── BENTO CELL ─── */
 function BentoCell({
   children,
   className = "",
@@ -57,7 +59,7 @@ function BentoCell({
   );
 }
 
-/* ─── GLASS CARD — for contact section only ─── */
+/* ─── GLASS CARD ─── */
 function GlassCard({
   children,
   className = "",
@@ -214,6 +216,9 @@ export default function App() {
     contact: null,
   });
 
+  /* ── Supabase data ── */
+  const { projects, loading: projectsLoading } = useSupabaseProjects();
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -221,18 +226,18 @@ export default function App() {
   });
 
   const scrollPrev = useCallback(() => {
-    if (!emblaApi) return;
+    if (!emblaApi || projects.length === 0) return;
     emblaApi.scrollPrev();
     setActiveIndex(
       (emblaApi.selectedScrollSnap() - 1 + projects.length) % projects.length,
     );
-  }, [emblaApi]);
+  }, [emblaApi, projects.length]);
 
   const scrollNext = useCallback(() => {
-    if (!emblaApi) return;
+    if (!emblaApi || projects.length === 0) return;
     emblaApi.scrollNext();
     setActiveIndex((emblaApi.selectedScrollSnap() + 1) % projects.length);
-  }, [emblaApi]);
+  }, [emblaApi, projects.length]);
 
   const scrollTo = (id: string) => {
     if (id === "projects") {
@@ -257,7 +262,6 @@ export default function App() {
     });
   };
 
-  /* Watch dark mode */
   useEffect(() => {
     const obs = new MutationObserver(() =>
       setIsDark(document.documentElement.classList.contains("dark")),
@@ -269,7 +273,6 @@ export default function App() {
     return () => obs.disconnect();
   }, []);
 
-  /* IntersectionObserver for active nav */
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) =>
@@ -285,21 +288,26 @@ export default function App() {
     return () => obs.disconnect();
   }, []);
 
-  /* Auto-rotate project */
   useEffect(() => {
-    if (page !== null) return;
+    if (page !== null || projects.length === 0) return;
     const id = setInterval(
       () => setActiveIndex((p) => (p + 1) % projects.length),
       5500,
     );
     return () => clearInterval(id);
-  }, [page]);
+  }, [page, projects.length]);
+
+  /* Reset activeIndex ถ้า projects เปลี่ยน */
+  useEffect(() => {
+    if (projects.length > 0) setActiveIndex(0);
+  }, [projects.length]);
 
   const selectedProject =
     page && page !== "projects-hub"
       ? (projects.find((p) => p.id === page) ?? null)
       : null;
-  const featured = projects[activeIndex];
+
+  const featured = projects[activeIndex] ?? null;
   const rest = projects.filter((_, i) => i !== activeIndex).slice(0, 2);
 
   /* ── Route: Detail ── */
@@ -308,10 +316,11 @@ export default function App() {
       <AnimatePresence mode="wait">
         <ProjectDetailPage
           key={selectedProject.id}
-          project={selectedProject}
+          project={selectedProject as any}
           isDark={isDark}
           onBack={() => nav.back()}
           onNavigate={(id) => nav.push(id)}
+          onHome={() => nav.push(null)}
         />
       </AnimatePresence>
     );
@@ -352,9 +361,7 @@ export default function App() {
       />
       <GlobalBackground isDark={isDark} />
       <main className="overflow-hidden text-[var(--color-text-primary)]">
-        {/* ══════════════════════════════════════════════
-            HOME — Borderless Bento Hero
-        ══════════════════════════════════════════════ */}
+        {/* ══ HOME ══ */}
         <section
           id="home"
           ref={(el) => {
@@ -362,7 +369,6 @@ export default function App() {
           }}
           className="relative min-h-screen flex flex-col overflow-hidden"
         >
-          {/* ── BG image — clipped inside section ── */}
           <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
             <img
               src={isDark ? "/images/dark-bg.jpg" : "/images/light-bg.jpg"}
@@ -374,13 +380,11 @@ export default function App() {
             <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-bg-primary)]/60 via-transparent to-[var(--color-bg-primary)]" />
           </div>
 
-          {/* ── Ambient glows ── */}
           <div className="pointer-events-none absolute inset-0 z-[1]">
             <div className="absolute top-[-8%] left-[-4%] h-[550px] w-[550px] rounded-full bg-blue-500/[0.07] blur-[130px]" />
             <div className="absolute bottom-[5%] right-[-4%] h-[450px] w-[450px] rounded-full bg-violet-500/[0.06] blur-[110px]" />
           </div>
 
-          {/* ── Main content — vertically centered with top navbar offset ── */}
           <div className="relative z-10 flex flex-col flex-1">
             <Container className="flex-1 flex flex-col justify-center pt-28 pb-32 md:pt-32 md:pb-36">
               <motion.div
@@ -388,12 +392,10 @@ export default function App() {
                 animate={introComplete ? "visible" : "hidden"}
                 variants={stagger}
               >
-                {/* ── HERO BLOCK: headline left / meta right ── */}
                 <motion.div
                   variants={fadeUp}
                   className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12 md:mb-16"
                 >
-                  {/* Headline */}
                   <div className="flex-1 min-w-0">
                     <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/[0.06] px-3.5 py-1.5 text-xs text-green-400">
                       <span className="relative flex h-1.5 w-1.5">
@@ -418,7 +420,6 @@ export default function App() {
                     </h1>
                   </div>
 
-                  {/* Meta + CTAs */}
                   <div className="lg:max-w-[340px] flex flex-col gap-5 lg:pb-2 shrink-0">
                     <div>
                       <p className="text-[10px] tracking-[0.18em] uppercase text-[var(--color-text-secondary)] mb-2 opacity-50">
@@ -446,9 +447,8 @@ export default function App() {
                   </div>
                 </motion.div>
 
-                {/* ── BOTTOM BENTO STRIP ── */}
+                {/* BOTTOM BENTO */}
                 <div className="grid grid-cols-4 md:grid-cols-12 gap-2.5 md:gap-3">
-                  {/* Skills */}
                   {skillBentos.map((skill) => (
                     <motion.div
                       key={skill.label}
@@ -477,7 +477,6 @@ export default function App() {
                     </motion.div>
                   ))}
 
-                  {/* Stats */}
                   {stats.map((stat) => (
                     <motion.div
                       key={stat.label}
@@ -495,7 +494,6 @@ export default function App() {
                     </motion.div>
                   ))}
 
-                  {/* Tech tags — full width */}
                   <motion.div
                     variants={fadeUp}
                     className="col-span-4 md:col-span-12"
@@ -518,14 +516,12 @@ export default function App() {
               </motion.div>
             </Container>
 
-            {/* ── SCROLL INDICATOR — pinned below all content ── */}
             <motion.button
               onClick={() => scrollTo("about")}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.4, duration: 0.6 }}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5
-                text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors duration-300 group"
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors duration-300 group"
             >
               <span className="text-[9px] tracking-[0.22em] uppercase opacity-40 group-hover:opacity-70 transition-opacity">
                 Scroll
@@ -547,9 +543,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════════
-            ABOUT — Borderless Bento
-        ══════════════════════════════════════════════ */}
+        {/* ══ ABOUT ══ */}
         <section
           id="about"
           ref={(el) => {
@@ -557,7 +551,6 @@ export default function App() {
           }}
           className="relative overflow-hidden py-24 md:py-32"
         >
-          {/* Ambient glow */}
           <div className="pointer-events-none absolute inset-0 z-[1]">
             <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/[0.04] blur-[150px]" />
           </div>
@@ -580,7 +573,6 @@ export default function App() {
                 </motion.div>
 
                 <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-3 md:gap-4">
-                  {/* BIO */}
                   <motion.div
                     variants={fadeUp}
                     className="col-span-4 md:col-span-8 lg:col-span-7"
@@ -595,13 +587,11 @@ export default function App() {
                           Introduction
                         </span>
                       </div>
-
                       <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-5 text-[var(--color-text-primary)]">
                         PASIN
                         <br />
                         PROMSOPA
                       </h3>
-
                       <p className="text-sm md:text-base leading-[1.9] text-[var(--color-text-secondary)]">
                         ผมเป็นนักศึกษาวิทยาการคอมพิวเตอร์จาก{" "}
                         <strong className="text-[var(--color-text-primary)] font-medium">
@@ -616,7 +606,6 @@ export default function App() {
                         โดยให้ความสำคัญกับความชัดเจน อารมณ์
                         และความรู้สึกของผู้ชม
                       </p>
-
                       <div className="mt-8 grid grid-cols-2 gap-3">
                         {infoRows.map(({ label, val }) => (
                           <div key={label}>
@@ -632,7 +621,6 @@ export default function App() {
                     </BentoCell>
                   </motion.div>
 
-                  {/* PROFILE IMAGE */}
                   <motion.div
                     variants={fadeUp}
                     className="col-span-4 md:col-span-4 lg:col-span-5 row-span-2"
@@ -647,7 +635,6 @@ export default function App() {
                     </BentoCell>
                   </motion.div>
 
-                  {/* ABOUT CENTER IMAGE */}
                   <motion.div
                     variants={fadeUp}
                     className="col-span-4 md:col-span-4 lg:col-span-7"
@@ -675,9 +662,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════════
-            PROJECTS — Bento showcase (dark)
-        ══════════════════════════════════════════════ */}
+        {/* ══ PROJECTS ══ */}
         <section
           id="projects"
           ref={(el) => {
@@ -697,7 +682,6 @@ export default function App() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.05 }}
             >
-              {/* Header */}
               <motion.div
                 variants={fadeUp}
                 className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 md:mb-12"
@@ -712,8 +696,9 @@ export default function App() {
                 </div>
                 <div className="flex items-center gap-3 pb-1">
                   <span className="text-sm text-[var(--color-text-secondary)] tabular-nums font-mono opacity-60">
-                    {String(activeIndex + 1).padStart(2, "0")} /{" "}
-                    {String(projects.length).padStart(2, "0")}
+                    {projects.length > 0
+                      ? `${String(activeIndex + 1).padStart(2, "0")} / ${String(projects.length).padStart(2, "0")}`
+                      : "—"}
                   </span>
                   <div className="flex gap-1.5">
                     {[scrollPrev, scrollNext].map((fn, i) => (
@@ -739,106 +724,124 @@ export default function App() {
                 </div>
               </motion.div>
 
+              {/* Loading state */}
+              {projectsLoading && (
+                <motion.div
+                  variants={fadeUp}
+                  className="flex items-center justify-center h-[300px] gap-3 text-[var(--color-text-secondary)]"
+                >
+                  <Loader2 size={20} className="animate-spin" />
+                  <span className="text-sm">Loading projects…</span>
+                </motion.div>
+              )}
+
               {/* Desktop bento grid */}
-              <motion.div
-                variants={fadeUp}
-                className="hidden md:grid gap-3"
-                style={{
-                  gridTemplateColumns: "1.6fr 1fr",
-                  gridTemplateRows: "290px 290px",
-                  height: "592px",
-                }}
-              >
-                <AnimatePresence mode="popLayout">
-                  <motion.div
-                    key={"featured-" + featured.id}
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    style={{ gridColumn: 1, gridRow: "1 / 3" }}
-                    className="rounded-2xl overflow-hidden"
-                  >
-                    <ProjectCard
-                      project={featured}
-                      featured
-                      onClick={() => nav.push(featured.id)}
-                    />
-                  </motion.div>
-                </AnimatePresence>
-                {rest.map((proj, i) => (
-                  <AnimatePresence key={"sm-" + proj?.id + i} mode="popLayout">
+              {!projectsLoading && featured && (
+                <motion.div
+                  variants={fadeUp}
+                  className="hidden md:grid gap-3"
+                  style={{
+                    gridTemplateColumns: "1.6fr 1fr",
+                    gridTemplateRows: "290px 290px",
+                    height: "592px",
+                  }}
+                >
+                  <AnimatePresence mode="popLayout">
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{
-                        duration: 0.35,
-                        ease: [0.16, 1, 0.3, 1],
-                        delay: i * 0.05,
-                      }}
-                      style={{ gridColumn: 2, gridRow: i + 1 }}
+                      key={"featured-" + featured.id}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ gridColumn: 1, gridRow: "1 / 3" }}
                       className="rounded-2xl overflow-hidden"
                     >
-                      {proj && (
-                        <ProjectCard
-                          project={proj}
-                          onClick={() => nav.push(proj.id)}
-                        />
-                      )}
+                      <ProjectCard
+                        project={featured}
+                        featured
+                        onClick={() => nav.push(featured.id)}
+                      />
                     </motion.div>
                   </AnimatePresence>
-                ))}
-              </motion.div>
+                  {rest.map((proj, i) => (
+                    <AnimatePresence
+                      key={"sm-" + proj?.id + i}
+                      mode="popLayout"
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{
+                          duration: 0.35,
+                          ease: [0.16, 1, 0.3, 1],
+                          delay: i * 0.05,
+                        }}
+                        style={{ gridColumn: 2, gridRow: i + 1 }}
+                        className="rounded-2xl overflow-hidden"
+                      >
+                        {proj && (
+                          <ProjectCard
+                            project={proj}
+                            onClick={() => nav.push(proj.id)}
+                          />
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
+                  ))}
+                </motion.div>
+              )}
 
               {/* Mobile carousel */}
-              <motion.div variants={fadeUp} className="md:hidden -mx-5">
-                <div ref={emblaRef} className="overflow-hidden px-5">
-                  <div className="flex gap-3">
-                    {projects.map((project) => (
-                      <div
-                        key={project.id}
-                        className="min-w-[85vw] h-[400px] rounded-2xl overflow-hidden flex-shrink-0"
-                      >
-                        <ProjectCard
-                          project={project}
-                          featured
-                          onClick={() => nav.push(project.id)}
-                        />
-                      </div>
-                    ))}
+              {!projectsLoading && projects.length > 0 && (
+                <motion.div variants={fadeUp} className="md:hidden -mx-5">
+                  <div ref={emblaRef} className="overflow-hidden px-5">
+                    <div className="flex gap-3">
+                      {projects.map((project) => (
+                        <div
+                          key={project.id}
+                          className="min-w-[85vw] h-[400px] rounded-2xl overflow-hidden flex-shrink-0"
+                        >
+                          <ProjectCard
+                            project={project}
+                            featured
+                            onClick={() => nav.push(project.id)}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              )}
 
               {/* Progress dots */}
-              <motion.div variants={fadeUp} className="flex gap-1.5 mt-6">
-                {projects.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveIndex(i)}
-                    className="h-[2px] rounded-full transition-all duration-500"
-                    style={{
-                      width: activeIndex === i ? 32 : 16,
-                      background:
-                        activeIndex === i
-                          ? isDark
-                            ? "rgba(255,255,255,0.9)"
-                            : "rgba(0,0,0,0.75)"
-                          : isDark
-                            ? "rgba(255,255,255,0.15)"
-                            : "rgba(0,0,0,0.12)",
-                    }}
-                  />
-                ))}
-              </motion.div>
+              {!projectsLoading && projects.length > 0 && (
+                <motion.div variants={fadeUp} className="flex gap-1.5 mt-6">
+                  {projects.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveIndex(i)}
+                      className="h-[2px] rounded-full transition-all duration-500"
+                      style={{
+                        width: activeIndex === i ? 32 : 16,
+                        background:
+                          activeIndex === i
+                            ? isDark
+                              ? "rgba(255,255,255,0.9)"
+                              : "rgba(0,0,0,0.75)"
+                            : isDark
+                              ? "rgba(255,255,255,0.15)"
+                              : "rgba(0,0,0,0.12)",
+                      }}
+                    />
+                  ))}
+                </motion.div>
+              )}
             </motion.div>
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════════
-            CONTACT — Glass Bento (keeps borders)
-        ══════════════════════════════════════════════ */}
+        {/* ══ CONTACT ══ */}
         <section
           id="contact"
           ref={(el) => {
@@ -909,7 +912,6 @@ export default function App() {
                   </motion.div>
                 ))}
 
-                {/* Profile photo */}
                 <motion.div
                   variants={fadeUp}
                   className="col-span-4 md:col-span-4 lg:col-span-6"
@@ -924,7 +926,6 @@ export default function App() {
                   </div>
                 </motion.div>
 
-                {/* CTA */}
                 <motion.div
                   variants={fadeUp}
                   className="col-span-4 md:col-span-4 lg:col-span-6"

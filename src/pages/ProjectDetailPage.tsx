@@ -8,6 +8,9 @@ import {
   ChevronRight,
   ZoomIn,
   Play,
+  Sun,
+  Moon,
+  Home,
 } from "lucide-react";
 
 const IconGitHub = ({ size = 14 }: { size?: number }) => (
@@ -27,6 +30,7 @@ interface Props {
   isDark: boolean;
   onBack: () => void;
   onNavigate: (id: string) => void;
+  onHome: () => void;
 }
 
 const fadeUp = {
@@ -80,7 +84,6 @@ function YouTubeEmbed({
 function YouTubeThumbnailSlide({
   videoId,
   onClick,
-  isDark,
 }: {
   videoId: string;
   onClick: () => void;
@@ -98,13 +101,10 @@ function YouTubeThumbnailSlide({
         alt="Video thumbnail"
         className="absolute inset-0 h-full w-full object-cover"
       />
-      {/* Dark scrim */}
       <div className="absolute inset-0 bg-black/30 transition-opacity duration-200 group-hover/yt:bg-black/20" />
-      {/* Play button */}
       <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-2xl transition-all duration-200 group-hover/yt:scale-110 group-hover/yt:bg-red-500">
         <Play size={22} className="translate-x-0.5 fill-white text-white" />
       </div>
-      {/* YouTube badge */}
       <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-[10px] text-white/80 backdrop-blur-sm">
         <svg
           width="12"
@@ -121,9 +121,168 @@ function YouTubeThumbnailSlide({
   );
 }
 
-function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
+/* ══════════════════════════════════════════════
+   DETAIL NAVBAR
+══════════════════════════════════════════════ */
+function DetailNavbar({
+  project,
+  isDark,
+  onBack,
+  onHome,
+  onToggleTheme,
+}: {
+  project: Project;
+  isDark: boolean;
+  onBack: () => void;
+  onHome: () => void;
+  onToggleTheme: () => void;
+}) {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const border = isDark ? "border-white/[0.07]" : "border-black/[0.06]";
+  const bg = scrolled
+    ? isDark
+      ? "bg-[#1a1a1a]/80 backdrop-blur-xl"
+      : "bg-[#f8f8f6]/85 backdrop-blur-xl"
+    : "bg-transparent";
+
+  return (
+    <header
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${bg} ${
+        scrolled ? `border-b ${border}` : ""
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-12">
+        {/* ── LEFT: Logo → Home ── */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onHome}
+            className={`text-base font-semibold tracking-tight transition-opacity duration-200 hover:opacity-60 ${
+              isDark ? "text-white" : "text-neutral-900"
+            }`}
+          >
+            Pasin.
+          </button>
+
+          {/* Divider */}
+          <span
+            className={`text-sm ${isDark ? "text-white/15" : "text-black/15"}`}
+          >
+            /
+          </span>
+
+          {/* Breadcrumb — project title (truncated) */}
+          <span
+            className={`hidden sm:block text-sm max-w-[180px] truncate ${
+              isDark ? "text-white/40" : "text-neutral-500"
+            }`}
+          >
+            {project.title}
+          </span>
+        </div>
+
+        {/* ── CENTER: Back to projects ── */}
+        <button
+          onClick={onBack}
+          className={`flex items-center gap-2 text-sm font-medium transition-all duration-200 group ${
+            isDark
+              ? "text-white/50 hover:text-white"
+              : "text-neutral-500 hover:text-neutral-900"
+          }`}
+        >
+          <ArrowLeft
+            size={15}
+            className="transition-transform duration-200 group-hover:-translate-x-1"
+          />
+          <span className="hidden sm:inline">Back to projects</span>
+          <span className="sm:hidden">Back</span>
+        </button>
+
+        {/* ── RIGHT: Actions ── */}
+        <div className="flex items-center gap-2">
+          {/* GitHub */}
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs transition-all duration-200 hover:scale-105 ${
+                isDark
+                  ? "border-white/10 bg-white/5 text-white/55 hover:text-white"
+                  : "border-black/10 bg-black/[0.04] text-neutral-600 hover:text-neutral-900"
+              }`}
+            >
+              <IconGitHub size={13} />
+              <span className="hidden sm:inline">GitHub</span>
+            </a>
+          )}
+
+          {/* Live site */}
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-all duration-200 hover:scale-105 ${
+                isDark
+                  ? "bg-white text-black hover:bg-white/90"
+                  : "bg-neutral-900 text-white hover:bg-neutral-700"
+              }`}
+            >
+              <span className="hidden sm:inline">Live</span>
+              <ExternalLink size={12} />
+            </a>
+          )}
+
+          {/* Theme toggle */}
+          <button
+            onClick={onToggleTheme}
+            aria-label="Toggle theme"
+            className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 ${
+              isDark
+                ? "border-white/10 bg-white/5 text-white/60 hover:text-white"
+                : "border-black/10 bg-black/[0.04] text-neutral-600 hover:text-neutral-900"
+            }`}
+          >
+            {isDark ? <Sun size={14} /> : <Moon size={14} />}
+          </button>
+
+          {/* Home icon — mobile shortcut */}
+          <button
+            onClick={onHome}
+            aria-label="Go home"
+            className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 sm:hidden ${
+              isDark
+                ? "border-white/10 bg-white/5 text-white/60 hover:text-white"
+                : "border-black/10 bg-black/[0.04] text-neutral-600 hover:text-neutral-900"
+            }`}
+          >
+            <Home size={14} />
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   MAIN COMPONENT
+══════════════════════════════════════════════ */
+function ProjectDetailPage({
+  project,
+  isDark,
+  onBack,
+  onNavigate,
+  onHome,
+}: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [playingVideo, setPlayingVideo] = useState(false); // true = iframe shown
+  const [playingVideo, setPlayingVideo] = useState(false);
   const [expandedCat, setExpandedCat] = useState<string | null>(
     project.categoryId,
   );
@@ -131,6 +290,20 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [localDark, setLocalDark] = useState(isDark);
+
+  // sync localDark กับ prop isDark
+  useEffect(() => {
+    setLocalDark(isDark);
+  }, [isDark]);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    root.classList.toggle("dark");
+    const dark = root.classList.contains("dark");
+    setLocalDark(dark);
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  };
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -144,7 +317,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
   const hasMultiple = allMedia.length > 1;
   const activeItem = allMedia[activeIndex];
   const isActiveYouTube = isYouTube(activeItem);
-
   const shouldPause = isHovered || lightboxOpen || playingVideo;
 
   useEffect(() => {
@@ -160,17 +332,14 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
     setPlayingVideo(false);
   }, [activeIndex]);
 
-  // ── auto-cycle ──
   const startCycle = useCallback(() => {
     if (!hasMultiple) return;
     progressStartRef.current = Date.now();
-
     timerRef.current = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % allMedia.length);
       setPlayingVideo(false);
       progressStartRef.current = Date.now();
     }, AUTO_CYCLE_MS);
-
     progressTimerRef.current = setInterval(() => {
       const elapsed = Date.now() - progressStartRef.current;
       setProgress(Math.min((elapsed / AUTO_CYCLE_MS) * 100, 100));
@@ -183,11 +352,8 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!shouldPause) {
-      startCycle();
-    } else {
-      stopCycle();
-    }
+    if (!shouldPause) startCycle();
+    else stopCycle();
     return stopCycle;
   }, [shouldPause, startCycle, stopCycle]);
 
@@ -207,13 +373,11 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
     () => goToIndex((activeIndex - 1 + allMedia.length) % allMedia.length),
     [activeIndex, allMedia.length, goToIndex],
   );
-
   const nextSlide = useCallback(
     () => goToIndex((activeIndex + 1) % allMedia.length),
     [activeIndex, allMedia.length, goToIndex],
   );
 
-  // ── lightbox ──
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
@@ -228,7 +392,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
     [allMedia.length],
   );
 
-  // ── keyboard ──
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (lightboxOpen) {
@@ -245,12 +408,11 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
   }, [lightboxOpen, lbPrev, lbNext, prevSlide, nextSlide]);
 
   // ── theme tokens ──
-  const bg = isDark ? "bg-[#0a0a0a]" : "bg-neutral-50";
-  const text = isDark ? "text-white" : "text-neutral-900";
-  const muted = isDark ? "text-white/45" : "text-neutral-500";
-  const border = isDark ? "border-white/8" : "border-neutral-200";
-  const surface = isDark ? "bg-white/4" : "bg-white";
-  const surfaceHover = isDark ? "hover:bg-white/7" : "hover:bg-neutral-50";
+  const text = localDark ? "text-white" : "text-neutral-900";
+  const muted = localDark ? "text-white/45" : "text-neutral-500";
+  const border = localDark ? "border-white/8" : "border-neutral-200";
+  const surface = localDark ? "bg-white/4" : "bg-white";
+  const surfaceHover = localDark ? "hover:bg-white/7" : "hover:bg-neutral-50";
 
   return (
     <motion.div
@@ -260,8 +422,18 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
       transition={{ duration: 0.25 }}
       className={`min-h-screen ${text} relative`}
     >
-      {/* BG image — fixed, shared layer */}
-      <GlobalBackground isDark={isDark} />
+      <GlobalBackground isDark={localDark} />
+
+      {/* ── NAVBAR ── */}
+      <DetailNavbar
+        project={project}
+        isDark={localDark}
+        onBack={onBack}
+        onHome={onHome}
+        onToggleTheme={toggleTheme}
+      />
+
+      {/* ── LIGHTBOX ── */}
       <AnimatePresence>
         {lightboxOpen && (
           <motion.div
@@ -272,7 +444,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 backdrop-blur-sm"
             onClick={closeLightbox}
           >
-            {/* Close */}
             <button
               onClick={closeLightbox}
               className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-200 hover:bg-white/20"
@@ -281,12 +452,10 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
               <X size={18} />
             </button>
 
-            {/* Counter */}
             <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-xs text-white/70 backdrop-blur-sm">
               {lightboxIndex + 1} / {allMedia.length}
             </div>
 
-            {/* Prev */}
             {hasMultiple && (
               <button
                 onClick={(e) => {
@@ -300,7 +469,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
               </button>
             )}
 
-            {/* Media */}
             <motion.div
               key={lightboxIndex}
               initial={{ opacity: 0, scale: 0.96 }}
@@ -344,7 +512,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
               )}
             </motion.div>
 
-            {/* Next */}
             {hasMultiple && (
               <button
                 onClick={(e) => {
@@ -358,7 +525,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
               </button>
             )}
 
-            {/* Lightbox thumbnails */}
             {hasMultiple && (
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 rounded-2xl bg-black/50 p-2 backdrop-blur-sm">
                 {allMedia.map((item, i) => (
@@ -396,52 +562,8 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
         )}
       </AnimatePresence>
 
-      <div
-        className={`sticky top-0 z-40 border-b backdrop-blur-xl ${border} ${
-          isDark ? "bg-black/60" : "bg-white/80"
-        }`}
-      >
-        <div className="mx-auto flex h-14 md:h-16 max-w-7xl items-center justify-between px-4 md:px-12">
-          <button
-            onClick={onBack}
-            className={`flex items-center gap-2 text-sm transition-colors duration-200 ${muted} hover:${text}`}
-          >
-            <ArrowLeft size={15} />
-            <span className="hidden sm:inline">Back to projects</span>
-            <span className="sm:hidden">Back</span>
-          </button>
-          <div className="flex items-center gap-2">
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs transition-all duration-200 hover:scale-105 ${border} ${surface} ${muted}`}
-              >
-                <IconGitHub size={13} />
-                <span className="hidden sm:inline">GitHub</span>
-              </a>
-            )}
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-all duration-200 hover:scale-105 ${
-                  isDark
-                    ? "bg-white text-black hover:bg-white/90"
-                    : "bg-neutral-900 text-white hover:bg-neutral-700"
-                }`}
-              >
-                Live site <ExternalLink size={12} />
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── MAIN LAYOUT ───────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-4 py-8 md:px-12 md:py-16">
+      {/* ── MAIN LAYOUT — pt-16 เว้นพื้นที่ navbar ── */}
+      <div className="mx-auto max-w-7xl px-4 pt-24 pb-8 md:px-12 md:pt-28 md:pb-16">
         <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
           {/* ── LEFT ── */}
           <div className="flex-1 min-w-0">
@@ -496,7 +618,9 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
               >
                 {/* Main slide */}
                 <div
-                  className={`group relative overflow-hidden rounded-2xl border ${border} ${isDark ? "bg-black" : "bg-neutral-900"}`}
+                  className={`group relative overflow-hidden rounded-2xl border ${border} ${
+                    localDark ? "bg-black" : "bg-neutral-900"
+                  }`}
                   style={{ aspectRatio: "16/9" }}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
@@ -512,7 +636,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                     >
                       {isActiveYouTube ? (
                         playingVideo ? (
-                          // Embed shown after user clicks play thumbnail
                           <YouTubeEmbed
                             videoId={
                               (
@@ -535,7 +658,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                               ).videoId
                             }
                             onClick={() => setPlayingVideo(true)}
-                            isDark={isDark}
+                            isDark={localDark}
                           />
                         )
                       ) : (
@@ -555,7 +678,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                     </motion.div>
                   </AnimatePresence>
 
-                  {/* Progress bar (hidden when video is playing) */}
+                  {/* Progress bar */}
                   {hasMultiple && !shouldPause && (
                     <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/30 pointer-events-none">
                       <div
@@ -572,7 +695,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                     </div>
                   )}
 
-                  {/* Video playing pill */}
+                  {/* Playing pill */}
                   {playingVideo && (
                     <div className="absolute bottom-3 left-3 rounded-full bg-red-600/80 px-2.5 py-1 text-[10px] text-white backdrop-blur-sm pointer-events-none flex items-center gap-1">
                       <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
@@ -587,7 +710,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                     </div>
                   )}
 
-                  {/* Expand button (not shown when video is playing — YouTube already has fullscreen) */}
+                  {/* Expand */}
                   {!playingVideo && (
                     <button
                       onClick={() => openLightbox(activeIndex)}
@@ -598,7 +721,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                     </button>
                   )}
 
-                  {/* Prev / Next arrows */}
+                  {/* Prev / Next */}
                   {hasMultiple && !playingVideo && (
                     <>
                       <button
@@ -628,10 +751,10 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                         onClick={() => goToIndex(i)}
                         className={`rounded-full transition-all duration-300 ${
                           activeIndex === i
-                            ? isDark
+                            ? localDark
                               ? "w-4 h-1.5 bg-white/70"
                               : "w-4 h-1.5 bg-neutral-700"
-                            : isDark
+                            : localDark
                               ? "w-1.5 h-1.5 bg-white/20 hover:bg-white/40"
                               : "w-1.5 h-1.5 bg-neutral-300 hover:bg-neutral-500"
                         }`}
@@ -650,7 +773,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                         onClick={() => goToIndex(i)}
                         className={`relative flex-shrink-0 h-14 w-20 overflow-hidden rounded-lg border transition-all duration-200 ${
                           activeIndex === i
-                            ? isDark
+                            ? localDark
                               ? "border-white/50 ring-1 ring-white/20 opacity-100"
                               : "border-neutral-800 ring-1 ring-neutral-300 opacity-100"
                             : `${border} opacity-45 hover:opacity-75`
@@ -662,7 +785,6 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                           alt=""
                           className="h-full w-full object-cover"
                         />
-                        {/* YouTube play icon overlay on thumbnail */}
                         {isYouTube(item) && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600/90">
@@ -678,10 +800,9 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                   </div>
                 )}
 
-                {/* Hint */}
                 {hasMultiple && (
                   <p
-                    className={`mt-2 text-center text-[10px] ${isDark ? "text-white/20" : "text-neutral-400"}`}
+                    className={`mt-2 text-center text-[10px] ${localDark ? "text-white/20" : "text-neutral-400"}`}
                   >
                     Use ← → arrow keys to navigate · click image to expand
                   </p>
@@ -698,12 +819,12 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
               className="mb-8 md:mb-10"
             >
               <p
-                className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${isDark ? "text-white/25" : "text-neutral-400"}`}
+                className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${localDark ? "text-white/25" : "text-neutral-400"}`}
               >
                 About this project
               </p>
               <p
-                className={`text-sm md:text-base leading-relaxed ${isDark ? "text-white/65" : "text-neutral-600"}`}
+                className={`text-sm md:text-base leading-relaxed ${localDark ? "text-white/65" : "text-neutral-600"}`}
               >
                 {project.description}
               </p>
@@ -719,7 +840,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                 className="mb-8 md:mb-10"
               >
                 <p
-                  className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${isDark ? "text-white/25" : "text-neutral-400"}`}
+                  className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${localDark ? "text-white/25" : "text-neutral-400"}`}
                 >
                   Key highlights
                 </p>
@@ -727,10 +848,10 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                   {project.highlights.map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <span
-                        className={`mt-[7px] h-1.5 w-1.5 flex-shrink-0 rounded-full ${isDark ? "bg-white/30" : "bg-neutral-400"}`}
+                        className={`mt-[7px] h-1.5 w-1.5 flex-shrink-0 rounded-full ${localDark ? "bg-white/30" : "bg-neutral-400"}`}
                       />
                       <span
-                        className={`text-sm leading-relaxed ${isDark ? "text-white/60" : "text-neutral-600"}`}
+                        className={`text-sm leading-relaxed ${localDark ? "text-white/60" : "text-neutral-600"}`}
                       >
                         {item}
                       </span>
@@ -748,7 +869,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
               variants={fadeUp}
             >
               <p
-                className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${isDark ? "text-white/25" : "text-neutral-400"}`}
+                className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${localDark ? "text-white/25" : "text-neutral-400"}`}
               >
                 Tech stack
               </p>
@@ -756,7 +877,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
-                    className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${border} ${surface} ${isDark ? "text-white/65" : "text-neutral-700"}`}
+                    className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${border} ${surface} ${localDark ? "text-white/65" : "text-neutral-700"}`}
                   >
                     {tag}
                   </span>
@@ -769,7 +890,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
           <div className="w-full lg:w-64 xl:w-72 flex-shrink-0">
             <div className="lg:sticky lg:top-24">
               <p
-                className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${isDark ? "text-white/25" : "text-neutral-400"}`}
+                className={`mb-4 text-[10px] font-semibold uppercase tracking-[0.15em] ${localDark ? "text-white/25" : "text-neutral-400"}`}
               >
                 All projects
               </p>
@@ -797,12 +918,12 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                         <div className="flex items-center gap-2">
                           <span className="text-base">{cat.icon}</span>
                           <span
-                            className={`text-xs font-medium ${hasCurrentProject ? (isDark ? "text-white" : "text-neutral-900") : isDark ? "text-white/60" : "text-neutral-600"}`}
+                            className={`text-xs font-medium ${hasCurrentProject ? (localDark ? "text-white" : "text-neutral-900") : localDark ? "text-white/60" : "text-neutral-600"}`}
                           >
                             {cat.category}
                           </span>
                           <span
-                            className={`text-[10px] rounded-full px-1.5 py-0.5 ${isDark ? "bg-white/8 text-white/35" : "bg-neutral-100 text-neutral-400"}`}
+                            className={`text-[10px] rounded-full px-1.5 py-0.5 ${localDark ? "bg-white/8 text-white/35" : "bg-neutral-100 text-neutral-400"}`}
                           >
                             {cat.items.length}
                           </span>
@@ -814,7 +935,7 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                           <ChevronDown
                             size={13}
                             className={
-                              isDark ? "text-white/30" : "text-neutral-400"
+                              localDark ? "text-white/30" : "text-neutral-400"
                             }
                           />
                         </motion.div>
@@ -845,14 +966,14 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                                     }
                                     className={`group flex items-start gap-2.5 rounded-lg p-2 text-left transition-all duration-200 ${
                                       isActive
-                                        ? isDark
+                                        ? localDark
                                           ? "bg-white/10 cursor-default"
                                           : "bg-neutral-100 cursor-default"
                                         : `${surfaceHover} hover:scale-[1.01] cursor-pointer`
                                     }`}
                                   >
                                     <div
-                                      className={`h-10 w-14 flex-shrink-0 overflow-hidden rounded-md border ${border} ${isDark ? "bg-white/5" : "bg-neutral-100"}`}
+                                      className={`h-10 w-14 flex-shrink-0 overflow-hidden rounded-md border ${border} ${localDark ? "bg-white/5" : "bg-neutral-100"}`}
                                     >
                                       <img
                                         src={item.coverImage}
@@ -863,24 +984,24 @@ function ProjectDetailPage({ project, isDark, onBack, onNavigate }: Props) {
                                     <div className="min-w-0 flex-1">
                                       <div className="flex items-start justify-between gap-1">
                                         <p
-                                          className={`text-xs font-medium leading-snug ${isActive ? (isDark ? "text-white" : "text-neutral-900") : isDark ? "text-white/70" : "text-neutral-700"}`}
+                                          className={`text-xs font-medium leading-snug ${isActive ? (localDark ? "text-white" : "text-neutral-900") : localDark ? "text-white/70" : "text-neutral-700"}`}
                                         >
                                           {item.title}
                                         </p>
                                         {!isActive && (
                                           <ArrowUpRight
                                             size={11}
-                                            className={`mt-0.5 flex-shrink-0 opacity-0 transition-opacity duration-200 group-hover:opacity-50 ${isDark ? "text-white" : "text-neutral-900"}`}
+                                            className={`mt-0.5 flex-shrink-0 opacity-0 transition-opacity duration-200 group-hover:opacity-50 ${localDark ? "text-white" : "text-neutral-900"}`}
                                           />
                                         )}
                                         {isActive && (
                                           <span
-                                            className={`mt-0.5 h-1.5 w-1.5 flex-shrink-0 rounded-full ${isDark ? "bg-white/50" : "bg-neutral-500"}`}
+                                            className={`mt-0.5 h-1.5 w-1.5 flex-shrink-0 rounded-full ${localDark ? "bg-white/50" : "bg-neutral-500"}`}
                                           />
                                         )}
                                       </div>
                                       <p
-                                        className={`mt-0.5 text-[10px] leading-snug line-clamp-1 ${isDark ? "text-white/30" : "text-neutral-400"}`}
+                                        className={`mt-0.5 text-[10px] leading-snug line-clamp-1 ${localDark ? "text-white/30" : "text-neutral-400"}`}
                                       >
                                         {item.tagline}
                                       </p>

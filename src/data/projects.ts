@@ -214,7 +214,7 @@ export const projectCategories: ProjectCategory[] = [
     items: [
       {
         id: "graphic-design-showcase",
-        title: "Garphic Design Showcase",
+        title: "Graphic Design Showcase",
         tagline: "This is my Show case Skill",
 
         description: "พิ้นที่เเสดงผลงานกราฟิก",
@@ -324,7 +324,7 @@ export const projectCategories: ProjectCategory[] = [
 
   {
     id: "video-editing",
-    category: "Vedio Editing",
+    category: "Video Editing",
     icon: "🎬",
     items: [
       {
