@@ -219,7 +219,7 @@ export const projectCategories: ProjectCategory[] = [
 
         description: "พิ้นที่เเสดงผลงานกราฟิก",
 
-        coverImage: "/images/project/garphic/1.png",
+        coverImage: "/images/project/garphic/7.png",
 
         images: [
           "/images/project/garphic/1.png",
