@@ -420,6 +420,47 @@ export const projectCategories: ProjectCategory[] = [
         ],
         tags: ["Premiere Pro", "After Effects"],
       },
+      {
+        id: "video-editing-ap",
+        title: "Another performance",
+
+        tagline: "From Imagination to Screen",
+
+        description: `โปรเจกต์ เป็นวิดีโอที่ใช้เเสดงผลงานเพิ่มเติม`,
+
+        coverImage: "/images/project/garphic/9.png",
+
+        images: [],
+
+        media: [
+          {
+            type: "image",
+            src: "/images/project/garphic/9.png",
+          },
+          {
+            type: "youtube",
+            videoId: toYouTubeId(
+              "https://www.youtube.com/watch?v=PThHYYqzG8c",
+            ),
+          },
+          {
+            type: "youtube",
+            videoId: toYouTubeId(
+              "https://www.youtube.com/watch?v=U5zVdnvQ1iY",
+            ),
+          },
+        ],
+
+        year: "2019",
+        role: "Video Editor",
+        highlights: [
+          "เริ่มต้นสร้างโปรเจกต์หนังสั้นและวิดีโอตั้งแต่ช่วงมัธยมเพื่อฝึกฝนทักษะด้านการตัดต่อและการเล่าเรื่อง",
+          "ดูแลกระบวนการผลิตคอนเทนต์ด้วยตนเอง ตั้งแต่คิดคอนเซปต์ ถ่ายทำ ตัดต่อ และเผยแพร่ผลงานบน YouTube",
+          "ทดลองการเล่าเรื่องผ่านภาพ เสียง และจังหวะวิดีโอ เพื่อสร้างอารมณ์และประสบการณ์ให้ผู้ชม",
+          "พัฒนาทักษะด้าน Video Editing, Creative Storytelling และ Visual Design ผ่านการสร้างผลงานจริงอย่างต่อเนื่อง",
+        ],
+        tags: ["Premiere Pro", "After Effects"],
+      }
     ],
   },
 

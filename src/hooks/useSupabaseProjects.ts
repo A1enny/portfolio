@@ -8,6 +8,10 @@ import { useState, useEffect, useRef } from "react";
 import { getProjects, getCategories } from "../lib/supabase";
 import type { FSProjectItem, Category } from "../lib/supabase";
 import { youtubeThumbnail } from "../data/projects";
+import {
+  projects as staticProjects,
+  projectCategories as staticCategories,
+} from "../data/projects";
 
 /* ── re-export helpers จาก projects.ts เพื่อ backward-compat ── */
 export { youtubeThumbnail };
@@ -51,6 +55,36 @@ let _cache: {
 
 let _fetchPromise: Promise<void> | null = null;
 
+/** Convert static projects.ts data to the Project type used here */
+function getStaticFallback(): { flat: Project[]; categories: ProjectCategory[] } {
+  const flat: Project[] = staticProjects.map((p) => ({
+    id: p.id,
+    categoryId: p.categoryId,
+    category: p.category,
+    title: p.title,
+    tagline: p.tagline,
+    description: p.description,
+    coverImage: p.coverImage,
+    media: (p.media ?? []) as MediaItem[],
+    images: p.images ?? [],
+    year: p.year,
+    role: p.role,
+    liveUrl: p.liveUrl,
+    githubUrl: p.githubUrl,
+    highlights: p.highlights ?? [],
+    tags: p.tags ?? [],
+  }));
+
+  const categories: ProjectCategory[] = staticCategories.map((cat) => ({
+    id: cat.id,
+    category: cat.category,
+    icon: cat.icon,
+    items: flat.filter((p) => p.categoryId === cat.id),
+  }));
+
+  return { flat, categories };
+}
+
 async function fetchData() {
   if (_cache) return;
   if (_fetchPromise) return _fetchPromise;
@@ -76,16 +110,43 @@ async function fetchData() {
       tags: p.tags ?? [],
     }));
 
+    /* ── Merge: เพิ่ม static projects ที่ไม่มีใน Supabase ── */
+    const supabaseIds = new Set(flat.map((p) => p.id));
+    const fallback = getStaticFallback();
+    for (const sp of fallback.flat) {
+      if (!supabaseIds.has(sp.id)) {
+        flat.push(sp);
+      }
+    }
+
     const sortedCats = [...cats].sort(
       (a, b) => (a.order ?? 0) - (b.order ?? 0),
     );
 
+    /* ── Build categories จาก Supabase + merge static categories ที่ขาด ── */
+    const catIds = new Set(sortedCats.map((c) => c.id));
     const categories: ProjectCategory[] = sortedCats.map((cat: Category) => ({
       id: cat.id,
       category: cat.category,
       icon: cat.icon,
       items: flat.filter((p) => p.categoryId === cat.id),
     }));
+
+    // เพิ่ม static categories ที่ไม่มีใน Supabase
+    for (const sc of fallback.categories) {
+      if (!catIds.has(sc.id)) {
+        categories.push({
+          ...sc,
+          items: flat.filter((p) => p.categoryId === sc.id),
+        });
+      } else {
+        // update items ของ category ที่มีอยู่แล้วให้รวม static projects ด้วย
+        const existing = categories.find((c) => c.id === sc.id);
+        if (existing) {
+          existing.items = flat.filter((p) => p.categoryId === sc.id);
+        }
+      }
+    }
 
     _cache = { projects: flat, categories, flat };
     _fetchPromise = null;
